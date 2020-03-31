@@ -1,6 +1,6 @@
 name: cron_parser
 description: A cron parser. Spits out next cron dates starting from now or a specific date.
-version: 0.1.0
+version: 0.0.1
 author: Ronny Bubke <ronny@bubke.de>
 
 environment:
