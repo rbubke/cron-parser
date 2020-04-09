@@ -1,6 +1,6 @@
 import 'package:test/test.dart';
 
-import '../lib/cron.dart';
+import '../lib/cron_parser.dart';
 
 void main() {
   test('Cron().parse() throws exception for invalid cron string', () {
