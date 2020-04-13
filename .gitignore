@@ -5,3 +5,6 @@
 .DS_Store
 /.flutter-plugins
 /.flutter-plugins-dependencies
+/example/.packages
+/example/pubspec.lock
+/example/.dart_tool/

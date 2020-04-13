@@ -1,7 +1,8 @@
 name: cron_parser
 description: A cron parser. Spits out next cron dates starting from now or a specific date.
-version: 0.1.3
+version: 0.1.4
 repository: https://github.com/rbubke/cron-parser
+homepage: https://github.com/rbubke/cron-parser
 
 environment:
   sdk: '>=2.1.0 <3.0.0'
