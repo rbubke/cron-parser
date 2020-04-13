@@ -3,3 +3,5 @@
 /pubspec.lock
 /.packages
 .DS_Store
+/.flutter-plugins
+/.flutter-plugins-dependencies

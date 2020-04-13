@@ -1,17 +1,25 @@
 // Copyright (c) 2020, rbubke. All rights reserved. Use of this source code
 // is governed by a BSD-style license that can be found in the LICENSE file.
 
+import 'package:timezone/data/latest.dart';
+import 'package:timezone/standalone.dart';
+import 'package:timezone/timezone.dart';
+
 abstract class HasNext<E> {
   E next();
 }
 
 abstract class Cron {
-  factory Cron() => _Cron();
+  factory Cron() {
+    initializeTimeZones();
+    return _Cron();
+  }
 
-  // Takes a [cronString] and an optional [startTime] and returns an
-  // iterator [HasNext] which delivers [DateTime] events. If no [startTime]
-  // is provided [DateTime.now()] is used.
-  HasNext<DateTime> parse(String cronString, [DateTime startTime]);
+  // Takes a [cronString], a [locationName] and an optional [startTime].
+  // It returns an iterator [HasNext] which delivers [TZDateTime] events. If no [startTime]
+  // is provided [TZDateTime.now(getLocation(locationName)] is used.
+  // The [locationName] string has to be in the format listed at http://www.iana.org/time-zones.
+  HasNext<TZDateTime> parse(String cronString, String locationName, [TZDateTime startTime]);
 }
 
 const String _regex0to59 = "([1-5]?[0-9])";
@@ -28,9 +36,13 @@ final RegExp _cronRegex = RegExp("^$_minutesRegex\\s+$_hoursRegex\\s+$_daysRegex
 
 class _Cron implements Cron {
   @override
-  HasNext<DateTime> parse(String cronString, [DateTime startTime]) {
-    _validate(cronString);
-    if (startTime == null) startTime = DateTime.now();
+  HasNext<TZDateTime> parse(String cronString, String locationName, [TZDateTime startTime]) {
+    assert(cronString.isNotEmpty);
+    assert(_cronRegex.hasMatch(cronString));
+    assert(locationName != null);
+    var location = getLocation(locationName);
+    if (startTime == null) startTime = TZDateTime.now(location);
+    startTime = TZDateTime.from(startTime, location);
     return _CronIterator(_parse(cronString), startTime);
   }
 
@@ -38,11 +50,6 @@ class _Cron implements Cron {
     List<List<int>> p = cronString.split(RegExp('\\s+')).map(_parseConstraint).toList();
     _Schedule schedule = _Schedule(minutes: p[0], hours: p[1], days: p[2], months: p[3], weekdays: p[4]);
     return schedule;
-  }
-
-  void _validate(String cronString) {
-    assert(cronString.isNotEmpty);
-    assert(_cronRegex.hasMatch(cronString));
   }
 }
 
@@ -103,27 +110,28 @@ List<int> _parseConstraint(dynamic constraint) {
   throw 'Unable to parse: $constraint';
 }
 
-class _CronIterator implements HasNext<DateTime> {
+class _CronIterator implements HasNext<TZDateTime> {
   _Schedule _schedule;
-  DateTime _currentDate;
+  TZDateTime _currentDate;
 
   _CronIterator(this._schedule, this._currentDate) {
-    _currentDate = DateTime.fromMillisecondsSinceEpoch(this._currentDate.millisecondsSinceEpoch ~/ 60000 * 60000);
+    _currentDate = TZDateTime.fromMillisecondsSinceEpoch(
+        _currentDate.location, this._currentDate.millisecondsSinceEpoch ~/ 60000 * 60000);
   }
 
-  DateTime next() {
+  TZDateTime next() {
     _currentDate = _currentDate.add(Duration(minutes: 1));
     while (true) {
       if (_schedule?.months?.contains(_currentDate.month) == false) {
-        _currentDate = DateTime(_currentDate.year, _currentDate.month + 1, 1);
+        _currentDate = TZDateTime(_currentDate.location, _currentDate.year, _currentDate.month + 1, 1);
         continue;
       }
       if (_schedule?.weekdays?.contains(_currentDate.weekday) == false) {
-        _currentDate = DateTime(_currentDate.year, _currentDate.month, _currentDate.day + 1);
+        _currentDate = TZDateTime(_currentDate.location, _currentDate.year, _currentDate.month, _currentDate.day + 1);
         continue;
       }
       if (_schedule?.days?.contains(_currentDate.day) == false) {
-        _currentDate = DateTime(_currentDate.year, _currentDate.month, _currentDate.day + 1);
+        _currentDate = TZDateTime(_currentDate.location, _currentDate.year, _currentDate.month, _currentDate.day + 1);
         continue;
       }
       if (_schedule?.hours?.contains(_currentDate.hour) == false) {
