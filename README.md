@@ -14,6 +14,8 @@ A simple usage example:
       // by default next cron dates are starting from the current date
       var cronIterator =  Cron().parse("0 * * * *", "Europe/London");
       TZDateTime nextDate = cronIterator.next();
+      // you can retrieve the current value by using the current method
+      TZDateTime currentDate = cronIterator.current(); // same as nextDate
       TZDateTime afterNextDate = cronIterator.next();
     }
 

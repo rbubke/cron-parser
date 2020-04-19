@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.1
+
+- Cron iterator now also makes the current value accessible
+
+
 ## 0.1.5
 
 - Formatted source with dartfmt

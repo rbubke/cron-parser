@@ -12,5 +12,6 @@ void main() {
   TZDateTime startDate = TZDateTime(getLocation("Europe/London"), 2020, 4, 01);
   cronIterator = Cron().parse("0 * * * *", "Europe/London", startDate);
   nextDate = cronIterator.next(); // 2020-04-01 01:00:00.000+0100
+  var currentDate = cronIterator.current(); // 2020-04-01 01:00:00.000+0100
   afterNextDate = cronIterator.next(); // 2020-04-01 02:00:00.000+0100
 }
