@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.1
+
+- Cron selection definitions now supported
+
+
 ## 0.2.1
 
 - Cron iterator now also makes the current value accessible
