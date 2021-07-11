@@ -6,9 +6,9 @@ import '../lib/cron_parser.dart';
 
 void main() {
   DateTime normalizedDate(
-      [DateTime dateTime, String locationName = "Europe/Berlin"]) {
+      [DateTime? dateTime, String locationName = "Europe/Berlin"]) {
     var location = getLocation(locationName);
-    TZDateTime date = dateTime == null ? TZDateTime.now(location) : dateTime;
+    TZDateTime date = dateTime == null ? TZDateTime.now(location) : dateTime as TZDateTime;
     return TZDateTime.from(
         date.subtract(Duration(
             microseconds: date.microsecond,
@@ -70,7 +70,7 @@ void main() {
 
   group("Cron().parse() delivers", () {
     test('correct locations', () {
-      TZDateTime date = normalizedDate();
+      TZDateTime date = normalizedDate() as TZDateTime;
       var cronIterator = Cron().parse("* * * * *", "Africa/Gaborone");
       expect(cronIterator.next().location.name, equals("Africa/Gaborone"));
       expect(date.location.name, equals("Europe/Berlin"));
@@ -79,7 +79,7 @@ void main() {
     });
 
     test('next minutes starting from date', () {
-      TZDateTime date = normalizedDate();
+      TZDateTime date = normalizedDate() as TZDateTime;
       var cronIterator = Cron().parse("* * * * *", "Europe/Berlin");
       date = TZDateTime.from(date, getLocation("Europe/Berlin"));
       expect(cronIterator.next(), equals(date.add(Duration(minutes: 1))));
@@ -197,7 +197,7 @@ void main() {
     test('next minutes range starting from date', () {
       DateTime date = normalizedDate(
           TZDateTime(getLocation("Europe/Berlin"), 2020, 03, 31));
-      var cronIterator = Cron().parse("0-3 * * * *", "Europe/Berlin", date);
+      var cronIterator = Cron().parse("0-3 * * * *", "Europe/Berlin", date as TZDateTime);
       date = TZDateTime.from(date, getLocation("Europe/Berlin"));
       expect(cronIterator.next(), equals(date.add(Duration(minutes: 1))));
       expect(cronIterator.next(), equals(date.add(Duration(minutes: 2))));
@@ -210,7 +210,7 @@ void main() {
     test('next minutes selection starting from date', () {
       DateTime date = normalizedDate(
           TZDateTime(getLocation("Europe/Berlin"), 2020, 03, 31));
-      var cronIterator = Cron().parse("0,1,2,3 * * * *", "Europe/Berlin", date);
+      var cronIterator = Cron().parse("0,1,2,3 * * * *", "Europe/Berlin", date as TZDateTime);
       date = TZDateTime.from(date, getLocation("Europe/Berlin"));
       expect(cronIterator.next(), equals(date.add(Duration(minutes: 1))));
       expect(cronIterator.next(), equals(date.add(Duration(minutes: 2))));
@@ -223,7 +223,7 @@ void main() {
     test('next hours range starting from date', () {
       DateTime date = normalizedDate(
           TZDateTime(getLocation("Europe/Berlin"), 2020, 03, 31));
-      var cronIterator = Cron().parse("0 0-3 * * *", "Europe/Berlin", date);
+      var cronIterator = Cron().parse("0 0-3 * * *", "Europe/Berlin", date as TZDateTime);
       date = TZDateTime.from(date, getLocation("Europe/Berlin"));
       expect(cronIterator.next(), equals(date.add(Duration(hours: 1))));
       expect(cronIterator.next(), equals(date.add(Duration(hours: 2))));
@@ -236,7 +236,7 @@ void main() {
     test('next hours selection starting from date', () {
       DateTime date = normalizedDate(
           TZDateTime(getLocation("Europe/Berlin"), 2020, 03, 31));
-      var cronIterator = Cron().parse("0 0,1,2,3 * * *", "Europe/Berlin", date);
+      var cronIterator = Cron().parse("0 0,1,2,3 * * *", "Europe/Berlin", date as TZDateTime);
       date = TZDateTime.from(date, getLocation("Europe/Berlin"));
       expect(cronIterator.next(), equals(date.add(Duration(hours: 1))));
       expect(cronIterator.next(), equals(date.add(Duration(hours: 2))));
@@ -249,7 +249,7 @@ void main() {
     test('next days range starting from date', () {
       DateTime date = normalizedDate(
           TZDateTime(getLocation("Europe/Berlin"), 2020, 03, 29));
-      var cronIterator = Cron().parse("0 0 1-3 * *", "Europe/Berlin", date);
+      var cronIterator = Cron().parse("0 0 1-3 * *", "Europe/Berlin", date as TZDateTime);
       expect(cronIterator.next(),
           equals(TZDateTime(getLocation("Europe/Berlin"), 2020, 04, 1)));
       expect(cronIterator.next(),
@@ -263,7 +263,7 @@ void main() {
     test('next days selection starting from date', () {
       DateTime date = normalizedDate(
           TZDateTime(getLocation("Europe/Berlin"), 2020, 03, 29));
-      var cronIterator = Cron().parse("0 0 1,2,3 * *", "Europe/Berlin", date);
+      var cronIterator = Cron().parse("0 0 1,2,3 * *", "Europe/Berlin", date as TZDateTime);
       expect(cronIterator.next(),
           equals(TZDateTime(getLocation("Europe/Berlin"), 2020, 04, 1)));
       expect(cronIterator.next(),
@@ -277,7 +277,7 @@ void main() {
     test('next month range starting from date', () {
       DateTime date = normalizedDate(
           TZDateTime(getLocation("Europe/Berlin"), 2020, 03, 29));
-      var cronIterator = Cron().parse("0 0 4 1-3 *", "Europe/Berlin", date);
+      var cronIterator = Cron().parse("0 0 4 1-3 *", "Europe/Berlin", date as TZDateTime);
       expect(cronIterator.next(),
           equals(TZDateTime(getLocation("Europe/Berlin"), 2021, 01, 4)));
       expect(cronIterator.next(),
@@ -291,7 +291,7 @@ void main() {
     test('next month selection starting from date', () {
       DateTime date = normalizedDate(
           TZDateTime(getLocation("Europe/Berlin"), 2020, 03, 29));
-      var cronIterator = Cron().parse("0 0 4 1,2,3 *", "Europe/Berlin", date);
+      var cronIterator = Cron().parse("0 0 4 1,2,3 *", "Europe/Berlin", date as TZDateTime);
       expect(cronIterator.next(),
           equals(TZDateTime(getLocation("Europe/Berlin"), 2021, 01, 4)));
       expect(cronIterator.next(),
@@ -305,7 +305,7 @@ void main() {
     test('next weekdays range starting from date', () {
       DateTime date = normalizedDate(
           TZDateTime(getLocation("Europe/Berlin"), 2020, 04, 01));
-      var cronIterator = Cron().parse("0 0 * * 0-5", "Europe/Berlin", date);
+      var cronIterator = Cron().parse("0 0 * * 0-5", "Europe/Berlin", date as TZDateTime);
       date = TZDateTime.from(date, getLocation("Europe/Berlin"));
       expect(cronIterator.next(),
           equals(TZDateTime(getLocation("Europe/Berlin"), 2020, 04, 2)));
@@ -331,7 +331,7 @@ void main() {
       DateTime date = normalizedDate(
           TZDateTime(getLocation("Europe/Berlin"), 2020, 04, 01));
       var cronIterator =
-          Cron().parse("0 0 * * 0,1,2,3,4,5", "Europe/Berlin", date);
+          Cron().parse("0 0 * * 0,1,2,3,4,5", "Europe/Berlin", date as TZDateTime);
       date = TZDateTime.from(date, getLocation("Europe/Berlin"));
       expect(cronIterator.next(),
           equals(TZDateTime(getLocation("Europe/Berlin"), 2020, 04, 2)));
@@ -356,7 +356,7 @@ void main() {
     test('next minutes interval starting from date', () {
       DateTime date = normalizedDate(
           TZDateTime(getLocation("Europe/Berlin"), 2020, 04, 01));
-      var cronIterator = Cron().parse("*/5 * * * *", "Europe/Berlin", date);
+      var cronIterator = Cron().parse("*/5 * * * *", "Europe/Berlin", date as TZDateTime);
       date = TZDateTime.from(date, getLocation("Europe/Berlin"));
       expect(cronIterator.next(), equals(date.add(Duration(minutes: 5))));
       expect(cronIterator.next(), equals(date.add(Duration(minutes: 10))));
@@ -376,7 +376,7 @@ void main() {
     test('next hours interval starting from date', () {
       initializeTimeZone();
       TZDateTime date = normalizedDate(
-          TZDateTime(getLocation("Europe/Berlin"), 2020, 04, 01));
+          TZDateTime(getLocation("Europe/Berlin"), 2020, 04, 01)) as TZDateTime;
       var cronIterator = Cron().parse("0 */2 * * *", "Europe/Berlin", date);
       date = TZDateTime.from(date, getLocation("Europe/Berlin"));
       expect(cronIterator.next(), equals(date.add(Duration(hours: 2))));
@@ -387,7 +387,7 @@ void main() {
     test('next days interval starting from date', () {
       DateTime date = normalizedDate(
           TZDateTime(getLocation("Europe/Berlin"), 2020, 04, 01));
-      var cronIterator = Cron().parse("0 0 */3 * *", "Europe/Berlin", date);
+      var cronIterator = Cron().parse("0 0 */3 * *", "Europe/Berlin", date as TZDateTime);
       expect(cronIterator.next(),
           equals(TZDateTime(getLocation("Europe/Berlin"), 2020, 04, 3)));
       expect(cronIterator.next(),
@@ -401,7 +401,7 @@ void main() {
     test('next month interval starting from date', () {
       DateTime date = normalizedDate(
           TZDateTime(getLocation("Europe/Berlin"), 2020, 04, 01));
-      var cronIterator = Cron().parse("0 0 1 */2 *", "Europe/Berlin", date);
+      var cronIterator = Cron().parse("0 0 1 */2 *", "Europe/Berlin", date as TZDateTime);
       expect(cronIterator.next(),
           equals(TZDateTime(getLocation("Europe/Berlin"), 2020, 6, 1)));
       expect(cronIterator.next(),
@@ -413,7 +413,7 @@ void main() {
     test('next weekdays interval starting from date', () {
       DateTime date = normalizedDate(
           TZDateTime(getLocation("Europe/Berlin"), 2020, 04, 01));
-      var cronIterator = Cron().parse("0 0 * * */2", "Europe/Berlin", date);
+      var cronIterator = Cron().parse("0 0 * * */2", "Europe/Berlin", date as TZDateTime);
       expect(cronIterator.next(),
           equals(TZDateTime(getLocation("Europe/Berlin"), 2020, 4, 2)));
       expect(cronIterator.next(),
@@ -431,7 +431,7 @@ void main() {
     test('when provided timezone is Europe/London', () {
       DateTime date = normalizedDate(
           TZDateTime(getLocation("Europe/Berlin"), 2020, 04, 01));
-      var cronIterator = Cron().parse("0 0 * * *", "Europe/London", date);
+      var cronIterator = Cron().parse("0 0 * * *", "Europe/London", date as TZDateTime);
       date = TZDateTime.from(date, getLocation("Europe/London"));
       expect(cronIterator.next(), equals(date.add(Duration(hours: 1))));
       expect(
@@ -444,7 +444,7 @@ void main() {
         () {
       DateTime date = normalizedDate(
           TZDateTime(getLocation("Europe/Berlin"), 2020, 04, 01));
-      var cronIterator = Cron().parse("0 19 * * *", "America/New_York", date);
+      var cronIterator = Cron().parse("0 19 * * *", "America/New_York", date as TZDateTime);
       expect(
           cronIterator.next(),
           equals(
@@ -470,7 +470,7 @@ void main() {
         () {
       DateTime date = normalizedDate(
           TZDateTime(getLocation("Europe/London"), 2020, 3, 29, 1));
-      var cronIterator = Cron().parse("0 * * * *", "Europe/London", date);
+      var cronIterator = Cron().parse("0 * * * *", "Europe/London", date as TZDateTime);
       date = TZDateTime.from(date, getLocation("Europe/London"));
       expect(cronIterator.next(),
           equals(TZDateTime(getLocation("Europe/London"), 2020, 3, 29, 3)));
