@@ -1,9 +1,13 @@
 # Changelog
 
+## 0.5.0
+
+- Added previous method, to get the previous crons
+
 ## 0.4.0
 
-- Migrate to null safety
-- Upgrade dependencies
+- Migrated to null safety
+- Upgraded dependencies
 
 ## 0.3.1
 
