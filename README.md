@@ -33,6 +33,6 @@ Another example this time with a specific start date:
 ## Links
 
 - [source code][source]
-- contributors: [Ronny Bubke][rbubke]
+- contributors: [Ronny Bubke](https://github.com/rbubke), [Nils Reichardt](https://github.com/nilsreichardt)
 
 [source]: https://github.com/rbubke/cron-parser
