@@ -9,6 +9,7 @@ same timezone provided with Cron().parse(...)
 A simple usage example:
 ```dart
 import 'package:cron_parser/cron_parser.dart';
+import 'package:timezone/timezone.dart';
 
 main() {
   // by default next cron dates are starting from the current date
@@ -23,6 +24,7 @@ main() {
 Another example this time with a specific start date:
 ```dart
 import 'package:cron_parser/cron_parser.dart';
+import 'package:timezone/timezone.dart';
 
 main() {
   TZDateTime startDate = TZDateTime(getLocation("Europe/London"), 2020, 4, 01);
