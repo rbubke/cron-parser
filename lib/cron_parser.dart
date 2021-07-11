@@ -7,6 +7,7 @@ import 'package:timezone/timezone.dart';
 
 abstract class HasNext<E> {
   E next();
+  E previous();
 
   E current();
 }
@@ -173,6 +174,40 @@ class _CronIterator implements HasNext<TZDateTime> {
       }
       if (_schedule.minutes?.contains(_currentDate.minute) == false) {
         _currentDate = _currentDate.add(Duration(minutes: 1));
+        continue;
+      }
+      return _currentDate;
+    }
+  }
+
+  @override
+  TZDateTime previous() {
+    _nextCalled = true;
+    _currentDate = _currentDate.subtract(Duration(minutes: 1));
+    while (true) {
+      if (_schedule.months?.contains(_currentDate.month) == false) {
+        _currentDate = TZDateTime(_currentDate.location, _currentDate.year,
+            _currentDate.month - 1, 1);
+        continue;
+      }
+      if (_schedule.weekdays?.contains(_currentDate.weekday) == false) {
+        _currentDate = TZDateTime(_currentDate.location, _currentDate.year,
+            _currentDate.month, _currentDate.day - 1);
+        continue;
+      }
+      if (_schedule.days?.contains(_currentDate.day) == false) {
+        _currentDate = TZDateTime(_currentDate.location, _currentDate.year,
+            _currentDate.month, _currentDate.day - 1);
+        continue;
+      }
+      if (_schedule.hours?.contains(_currentDate.hour) == false) {
+        _currentDate = _currentDate.subtract(Duration(hours: 1));
+        _currentDate =
+            _currentDate.subtract(Duration(minutes: _currentDate.minute));
+        continue;
+      }
+      if (_schedule.minutes?.contains(_currentDate.minute) == false) {
+        _currentDate = _currentDate.subtract(Duration(minutes: 1));
         continue;
       }
       return _currentDate;
