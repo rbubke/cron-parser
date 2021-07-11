@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.4.0
+
+- Migrate to null safety
+- Upgrade dependencies
+
 ## 0.3.1
 
 - Cron selection definitions now supported
