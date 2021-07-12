@@ -8,10 +8,14 @@ import 'package:timezone/timezone.dart';
 abstract class HasNext<E> {
   /// Find next suitable date
   E next();
+}
 
+abstract class HasPrevious<E> {
   /// Find previous suitable date
   E previous();
+}
 
+mixin CronIterator<E> on HasPrevious, HasNext {
   E current();
 }
 
@@ -25,7 +29,7 @@ abstract class Cron {
   /// It returns an iterator [HasNext] which delivers [TZDateTime] events. If no [startTime]
   /// is provided [TZDateTime.now(getLocation(locationName)] is used.
   /// The [locationName] string has to be in the format listed at http://www.iana.org/time-zones.
-  HasNext<TZDateTime> parse(String cronString, String locationName,
+  CronIterator<TZDateTime> parse(String cronString, String locationName,
       [TZDateTime? startTime]);
 }
 
@@ -49,7 +53,7 @@ final RegExp _cronRegex = RegExp(
 
 class _Cron implements Cron {
   @override
-  HasNext<TZDateTime> parse(String cronString, String locationName,
+  CronIterator<TZDateTime> parse(String cronString, String locationName,
       [TZDateTime? startTime]) {
     assert(cronString.isNotEmpty);
     assert(_cronRegex.hasMatch(cronString));
@@ -139,7 +143,7 @@ List<int>? _parseConstraint(dynamic constraint) {
   throw 'Unable to parse: $constraint';
 }
 
-class _CronIterator implements HasNext<TZDateTime> {
+class _CronIterator implements CronIterator<TZDateTime> {
   _Schedule _schedule;
   TZDateTime _currentDate;
 
