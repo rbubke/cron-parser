@@ -61,14 +61,6 @@ void main() {
         throwsA(TypeMatcher<AssertionError>()));
   });
 
-  test(
-      'Cron().parse() throws exception if current has been called before first next call',
-      () {
-    var cronIterator = Cron().parse("* * * * *", "Europe/Berlin");
-    expect(
-        () => cronIterator.current(), throwsA(TypeMatcher<AssertionError>()));
-  });
-
   group("Cron().parse() delivers", () {
     test('correct locations', () {
       TZDateTime date = normalizedDate() as TZDateTime;
@@ -546,7 +538,7 @@ void main() {
       expect(cronIterator.previous(),
           equals(TZDateTime(getLocation("Europe/Berlin"), 2020, 01, 4)));
       expect(cronIterator.previous(),
-          equals(TZDateTime(getLocation("Europe/Berlin"), 2019, 02, 4)));
+          equals(TZDateTime(getLocation("Europe/Berlin"), 2019, 03, 4)));
     });
 
     test('next month selection starting from date', () {
@@ -576,7 +568,7 @@ void main() {
       expect(cronIterator.previous(),
           equals(TZDateTime(getLocation("Europe/Berlin"), 2020, 01, 4)));
       expect(cronIterator.previous(),
-          equals(TZDateTime(getLocation("Europe/Berlin"), 2019, 02, 4)));
+          equals(TZDateTime(getLocation("Europe/Berlin"), 2019, 03, 4)));
     });
 
     test('next weekdays range starting from date', () {
@@ -988,6 +980,24 @@ void main() {
       expect(cronIterator.previous(),
           equals(TZDateTime(getLocation("Europe/London"), 2020, 3, 31, 22)));
       print(cronIterator.previous());
+    });
+  });
+
+  group('Smoke tests', () {
+    test('0 19 7 8 * (previous)', () {
+      TZDateTime startDate =
+          TZDateTime(getLocation("Europe/London"), 2021, 7, 12);
+      var cronIterator = Cron().parse("0 19 7 8 *", "Europe/London", startDate);
+      expect(cronIterator.previous(),
+          equals(TZDateTime(getLocation("Europe/London"), 2020, 8, 7, 19)));
+    });
+
+    test('0 19 7 8 * (next)', () {
+      TZDateTime startDate =
+          TZDateTime(getLocation("Europe/London"), 2021, 7, 12);
+      var cronIterator = Cron().parse("0 19 7 8 *", "Europe/London", startDate);
+      expect(cronIterator.next(),
+          equals(TZDateTime(getLocation("Europe/London"), 2021, 8, 7, 19)));
     });
   });
 }
