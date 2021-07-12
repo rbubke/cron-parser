@@ -6,7 +6,10 @@ import 'package:timezone/standalone.dart';
 import 'package:timezone/timezone.dart';
 
 abstract class HasNext<E> {
+  /// Find next suitable date
   E next();
+
+  /// Find previous suitable date
   E previous();
 
   E current();
