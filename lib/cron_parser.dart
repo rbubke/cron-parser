@@ -21,10 +21,10 @@ abstract class Cron {
     return _Cron();
   }
 
-  // Takes a [cronString], a [locationName] and an optional [startTime].
-  // It returns an iterator [HasNext] which delivers [TZDateTime] events. If no [startTime]
-  // is provided [TZDateTime.now(getLocation(locationName)] is used.
-  // The [locationName] string has to be in the format listed at http://www.iana.org/time-zones.
+  /// Takes a [cronString], a [locationName] and an optional [startTime].
+  /// It returns an iterator [HasNext] which delivers [TZDateTime] events. If no [startTime]
+  /// is provided [TZDateTime.now(getLocation(locationName)] is used.
+  /// The [locationName] string has to be in the format listed at http://www.iana.org/time-zones.
   HasNext<TZDateTime> parse(String cronString, String locationName,
       [TZDateTime? startTime]);
 }
