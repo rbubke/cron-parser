@@ -15,7 +15,7 @@ abstract class HasPrevious<E> {
   E previous();
 }
 
-mixin CronIterator<E> on HasPrevious, HasNext {
+mixin CronIterator<E> on HasPrevious<E>, HasNext<E> {
   E current();
 }
 
