@@ -1025,7 +1025,7 @@ void main() {
 
   group('Smoke tests', () {
     group('.next()', () {
-      test('0 19 7 8 * (next)', () {
+      test('0 19 7 8 *', () {
         TZDateTime startDate =
             TZDateTime(getLocation("Europe/London"), 2021, 7, 12);
         var cronIterator =
@@ -1036,7 +1036,7 @@ void main() {
     });
 
     group('.previous()', () {
-      test('0 19 7 8 * (previous)', () {
+      test('0 19 7 8 *', () {
         TZDateTime startDate =
             TZDateTime(getLocation("Europe/London"), 2021, 7, 12);
         var cronIterator =
