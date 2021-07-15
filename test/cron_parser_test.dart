@@ -1033,6 +1033,15 @@ void main() {
         expect(cronIterator.next(),
             equals(TZDateTime(getLocation("Europe/London"), 2021, 8, 7, 19)));
       });
+
+      test('0 11 * * *', () {
+        TZDateTime startDate =
+            TZDateTime(getLocation("Europe/London"), 2019, 11, 23, 12);
+        var cronIterator =
+            Cron().parse("0 11 * * *", "Europe/London", startDate);
+        expect(cronIterator.next(),
+            equals(TZDateTime(getLocation("Europe/London"), 2019, 11, 24, 11)));
+      });
     });
 
     group('.previous()', () {
@@ -1043,6 +1052,15 @@ void main() {
             Cron().parse("0 19 7 8 *", "Europe/London", startDate);
         expect(cronIterator.previous(),
             equals(TZDateTime(getLocation("Europe/London"), 2020, 8, 7, 19)));
+      });
+
+      test('0 11 * * *', () {
+        TZDateTime startDate =
+            TZDateTime(getLocation("Europe/London"), 2019, 11, 23, 12);
+        var cronIterator =
+            Cron().parse("0 11 * * *", "Europe/London", startDate);
+        expect(cronIterator.previous(),
+            equals(TZDateTime(getLocation("Europe/London"), 2019, 11, 23, 11)));
       });
     });
   });
