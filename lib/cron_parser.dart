@@ -146,6 +146,8 @@ List<int>? _parseConstraint(dynamic constraint) {
 class _CronIterator implements CronIterator<TZDateTime> {
   _Schedule _schedule;
   TZDateTime _currentDate;
+  bool _nextCalled = false;
+  bool _previousCalled = false;
 
   _CronIterator(this._schedule, this._currentDate) {
     _currentDate = TZDateTime.fromMillisecondsSinceEpoch(_currentDate.location,
@@ -154,6 +156,7 @@ class _CronIterator implements CronIterator<TZDateTime> {
 
   @override
   TZDateTime next() {
+    _nextCalled = true;
     _currentDate = _currentDate.add(Duration(minutes: 1));
     while (true) {
       if (_schedule.months?.contains(_currentDate.month) == false) {
@@ -187,6 +190,7 @@ class _CronIterator implements CronIterator<TZDateTime> {
 
   @override
   TZDateTime previous() {
+    _previousCalled = true;
     _currentDate = _currentDate.subtract(Duration(minutes: 1));
     while (true) {
       if (_schedule.minutes?.contains(_currentDate.minute) == false) {
@@ -229,6 +233,7 @@ class _CronIterator implements CronIterator<TZDateTime> {
 
   @override
   TZDateTime current() {
+    assert(_nextCalled || _previousCalled);
     return _currentDate;
   }
 }
