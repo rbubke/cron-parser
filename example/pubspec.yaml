@@ -1,9 +1,12 @@
 name: cron_parser_example
 description: A cron parser example.
-version: 0.2.1
+version: 0.5.0
+
+publish_to: none
 
 environment:
   sdk: '>=2.1.0 <3.0.0'
 
 dependencies:
-  cron_parser: ^0.3.1
+  cron_parser:
+    path: ../

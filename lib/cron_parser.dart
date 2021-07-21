@@ -6,8 +6,16 @@ import 'package:timezone/standalone.dart';
 import 'package:timezone/timezone.dart';
 
 abstract class HasNext<E> {
+  /// Find next suitable date
   E next();
+}
 
+abstract class HasPrevious<E> {
+  /// Find previous suitable date
+  E previous();
+}
+
+mixin CronIterator<E> on HasPrevious<E>, HasNext<E> {
   E current();
 }
 
@@ -17,12 +25,12 @@ abstract class Cron {
     return _Cron();
   }
 
-  // Takes a [cronString], a [locationName] and an optional [startTime].
-  // It returns an iterator [HasNext] which delivers [TZDateTime] events. If no [startTime]
-  // is provided [TZDateTime.now(getLocation(locationName)] is used.
-  // The [locationName] string has to be in the format listed at http://www.iana.org/time-zones.
-  HasNext<TZDateTime> parse(String cronString, String locationName,
-      [TZDateTime startTime]);
+  /// Takes a [cronString], a [locationName] and an optional [startTime].
+  /// It returns an iterator [HasNext] which delivers [TZDateTime] events. If no [startTime]
+  /// is provided [TZDateTime.now(getLocation(locationName)] is used.
+  /// The [locationName] string has to be in the format listed at http://www.iana.org/time-zones.
+  CronIterator<TZDateTime> parse(String cronString, String locationName,
+      [TZDateTime? startTime]);
 }
 
 const String _regex0to59 = "([1-5]?[0-9])";
@@ -45,11 +53,10 @@ final RegExp _cronRegex = RegExp(
 
 class _Cron implements Cron {
   @override
-  HasNext<TZDateTime> parse(String cronString, String locationName,
-      [TZDateTime startTime]) {
+  CronIterator<TZDateTime> parse(String cronString, String locationName,
+      [TZDateTime? startTime]) {
     assert(cronString.isNotEmpty);
     assert(_cronRegex.hasMatch(cronString));
-    assert(locationName != null);
     var location = getLocation(locationName);
     if (startTime == null) startTime = TZDateTime.now(location);
     startTime = TZDateTime.from(startTime, location);
@@ -57,7 +64,7 @@ class _Cron implements Cron {
   }
 
   _Schedule _parse(String cronString) {
-    List<List<int>> p =
+    List<List<int>?> p =
         cronString.split(RegExp('\\s+')).map(_parseConstraint).toList();
     _Schedule schedule = _Schedule(
         minutes: p[0], hours: p[1], days: p[2], months: p[3], weekdays: p[4]);
@@ -66,11 +73,11 @@ class _Cron implements Cron {
 }
 
 class _Schedule {
-  final List<int> minutes;
-  final List<int> hours;
-  final List<int> days;
-  final List<int> months;
-  final List<int> weekdays;
+  final List<int>? minutes;
+  final List<int>? hours;
+  final List<int>? days;
+  final List<int>? months;
+  final List<int>? weekdays;
 
   _Schedule._(this.minutes, this.hours, this.days, this.months, this.weekdays);
 
@@ -80,25 +87,25 @@ class _Schedule {
       dynamic days,
       dynamic months,
       dynamic weekdays}) {
-    List<int> parsedMinutes =
-        _parseConstraint(minutes)?.where((x) => x >= 0 && x <= 59)?.toList();
-    List<int> parsedHours =
-        _parseConstraint(hours)?.where((x) => x >= 0 && x <= 23)?.toList();
-    List<int> parsedDays =
-        _parseConstraint(days)?.where((x) => x >= 1 && x <= 31)?.toList();
-    List<int> parsedMonths =
-        _parseConstraint(months)?.where((x) => x >= 1 && x <= 12)?.toList();
-    List<int> parsedWeekdays = _parseConstraint(weekdays)
+    List<int>? parsedMinutes =
+        _parseConstraint(minutes)?.where((x) => x >= 0 && x <= 59).toList();
+    List<int>? parsedHours =
+        _parseConstraint(hours)?.where((x) => x >= 0 && x <= 23).toList();
+    List<int>? parsedDays =
+        _parseConstraint(days)?.where((x) => x >= 1 && x <= 31).toList();
+    List<int>? parsedMonths =
+        _parseConstraint(months)?.where((x) => x >= 1 && x <= 12).toList();
+    List<int>? parsedWeekdays = _parseConstraint(weekdays)
         ?.where((x) => x >= 0 && x <= 7)
-        ?.map((x) => x == 0 ? 7 : x)
-        ?.toSet()
-        ?.toList();
+        .map((x) => x == 0 ? 7 : x)
+        .toSet()
+        .toList();
     return _Schedule._(
         parsedMinutes, parsedHours, parsedDays, parsedMonths, parsedWeekdays);
   }
 }
 
-List<int> _parseConstraint(dynamic constraint) {
+List<int>? _parseConstraint(dynamic constraint) {
   if (constraint == null) return null;
   if (constraint is int) return [constraint];
   if (constraint is List<int>) return constraint;
@@ -107,12 +114,12 @@ List<int> _parseConstraint(dynamic constraint) {
     final parts = constraint.split(',');
     if (parts.length > 1) {
       final items =
-          parts.map(_parseConstraint).expand((list) => list).toSet().toList();
+          parts.map(_parseConstraint).expand((list) => list!).toSet().toList();
       items.sort();
       return items;
     }
 
-    int singleValue = int.tryParse(constraint);
+    int? singleValue = int.tryParse(constraint);
     if (singleValue != null) return [singleValue];
 
     if (constraint.startsWith('*/')) {
@@ -136,10 +143,11 @@ List<int> _parseConstraint(dynamic constraint) {
   throw 'Unable to parse: $constraint';
 }
 
-class _CronIterator implements HasNext<TZDateTime> {
+class _CronIterator implements CronIterator<TZDateTime> {
   _Schedule _schedule;
   TZDateTime _currentDate;
   bool _nextCalled = false;
+  bool _previousCalled = false;
 
   _CronIterator(this._schedule, this._currentDate) {
     _currentDate = TZDateTime.fromMillisecondsSinceEpoch(_currentDate.location,
@@ -151,28 +159,28 @@ class _CronIterator implements HasNext<TZDateTime> {
     _nextCalled = true;
     _currentDate = _currentDate.add(Duration(minutes: 1));
     while (true) {
-      if (_schedule?.months?.contains(_currentDate.month) == false) {
+      if (_schedule.months?.contains(_currentDate.month) == false) {
         _currentDate = TZDateTime(_currentDate.location, _currentDate.year,
             _currentDate.month + 1, 1);
         continue;
       }
-      if (_schedule?.weekdays?.contains(_currentDate.weekday) == false) {
+      if (_schedule.weekdays?.contains(_currentDate.weekday) == false) {
         _currentDate = TZDateTime(_currentDate.location, _currentDate.year,
             _currentDate.month, _currentDate.day + 1);
         continue;
       }
-      if (_schedule?.days?.contains(_currentDate.day) == false) {
+      if (_schedule.days?.contains(_currentDate.day) == false) {
         _currentDate = TZDateTime(_currentDate.location, _currentDate.year,
             _currentDate.month, _currentDate.day + 1);
         continue;
       }
-      if (_schedule?.hours?.contains(_currentDate.hour) == false) {
+      if (_schedule.hours?.contains(_currentDate.hour) == false) {
         _currentDate = _currentDate.add(Duration(hours: 1));
         _currentDate =
             _currentDate.subtract(Duration(minutes: _currentDate.minute));
         continue;
       }
-      if (_schedule?.minutes?.contains(_currentDate.minute) == false) {
+      if (_schedule.minutes?.contains(_currentDate.minute) == false) {
         _currentDate = _currentDate.add(Duration(minutes: 1));
         continue;
       }
@@ -181,8 +189,51 @@ class _CronIterator implements HasNext<TZDateTime> {
   }
 
   @override
+  TZDateTime previous() {
+    _previousCalled = true;
+    _currentDate = _currentDate.subtract(Duration(minutes: 1));
+    while (true) {
+      if (_schedule.minutes?.contains(_currentDate.minute) == false) {
+        _currentDate = _currentDate.subtract(Duration(minutes: 1));
+        continue;
+      }
+      if (_schedule.hours?.contains(_currentDate.hour) == false) {
+        _currentDate = _currentDate.subtract(Duration(hours: 1));
+        continue;
+      }
+      if (_schedule.days?.contains(_currentDate.day) == false) {
+        _currentDate = _currentDate.subtract(Duration(days: 1));
+        continue;
+      }
+      if (_schedule.weekdays?.contains(_currentDate.weekday) == false) {
+        _currentDate = TZDateTime(
+          _currentDate.location,
+          _currentDate.year,
+          _currentDate.month,
+          _currentDate.day - 1,
+          _currentDate.hour,
+          _currentDate.minute,
+        );
+        continue;
+      }
+      if (_schedule.months?.contains(_currentDate.month) == false) {
+        _currentDate = TZDateTime(
+          _currentDate.location,
+          _currentDate.year,
+          _currentDate.month - 1,
+          _currentDate.day,
+          _currentDate.hour,
+          _currentDate.minute,
+        );
+        continue;
+      }
+      return _currentDate;
+    }
+  }
+
+  @override
   TZDateTime current() {
-    assert(_nextCalled);
+    assert(_nextCalled || _previousCalled);
     return _currentDate;
   }
 }

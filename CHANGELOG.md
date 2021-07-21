@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.5.0
+
+- Added previous method, to get the previous crons: `CronIterator().previous()`
+- BREAKING CHANGE: `HasNext().current()` moved into `CronIterator().current()`
+
+## 0.4.0
+
+- Migrated to null safety
+- Upgraded dependencies
+
 ## 0.3.1
 
 - Cron selection definitions now supported
