@@ -62,6 +62,14 @@ void main() {
           throwsA(TypeMatcher<AssertionError>()));
     });
 
+    test(
+        'Cron().parse() throws exception if current has been called before first next or previous call',
+        () {
+      var cronIterator = Cron().parse("* * * * *", "Europe/Berlin");
+      expect(
+          () => cronIterator.current(), throwsA(TypeMatcher<AssertionError>()));
+    });
+
     group("delivers", () {
       test('correct locations', () {
         TZDateTime date = normalizedDate() as TZDateTime;
