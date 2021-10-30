@@ -1,10 +1,13 @@
 import 'package:test/test.dart';
 import 'package:timezone/standalone.dart';
 import 'package:timezone/timezone.dart';
+import 'package:timezone/data/latest.dart' as tz;
 
 import '../lib/cron_parser.dart';
 
 void main() {
+  tz.initializeTimeZones();
+
   group('Cron().parse()', () {
     TZDateTime normalizedDate(
         [DateTime? dateTime, String locationName = "Europe/Berlin"]) {
